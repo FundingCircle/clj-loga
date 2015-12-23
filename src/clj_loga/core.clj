@@ -61,12 +61,12 @@
         append-tag
         generate-string)))
 
-(def ^:private disabled-formatter?
-  (nil? (env :enable-log-format)))
+(def ^:private loga-enabled?
+  (= (env :enable-loga) "true"))
 
 (defn init-logging []
   "Initialize formatted logging."
-  (if-not disabled-formatter?
+  (if loga-enabled?
     (do (timbre/handle-uncaught-jvm-exceptions!)
         (merge-config! {:output-fn output-fn
                         :timestamp-opts iso-timestamp-opts}))

@@ -1,4 +1,5 @@
-# clj-loga
+# clj-loga [![Circle CI](https://circleci.com/gh/FundingCircle/clj-loga/tree/master.svg?style=svg)](https://circleci.com/gh/FundingCircle/clj-loga/tree/master)
+
 Library for custom log formatting and other helpers leveraging Timbre.
 
 ## Usage
@@ -11,7 +12,7 @@ Library for custom log formatting and other helpers leveraging Timbre.
 
 ```bash
 #export env variable to apply formatting
-ENABLE_LOG_FORMAT=anything
+ENABLE_LOGA=true
 ```
 
 **Repl**

@@ -12,4 +12,4 @@
                  ]
   :plugins [[lein-cljfmt  "0.3.0"]
             [lein-environ "1.0.1"]]
-  :profiles {:test {:env {:enable-log-format true}}})
+  :profiles {:test {:env {:enable-loga "true"}}})
