@@ -10,8 +10,8 @@
 
 (defmacro set-tag
   "Sets a tag, which is appended to the log event."
-  [tid* & body]
-  `(binding [_tag ~tid*] ~@body))
+  [tag* & body]
+  `(binding [_tag ~tag*] ~@body))
 
 (defn- get-tag []
   "Gets current _tag"
@@ -64,7 +64,7 @@
 (def ^:private loga-enabled?
   (= (env :enable-loga) "true"))
 
-(defn init-logging []
+(defn setup-loga []
   "Initialize formatted logging."
   (if loga-enabled?
     (do (timbre/handle-uncaught-jvm-exceptions!)

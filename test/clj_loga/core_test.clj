@@ -6,7 +6,7 @@
             [taoensso.timbre :as timbre :refer [info]]))
 
 (defn- log-to-atom [f]
-  (init-logging)
+  (setup-loga)
   (timbre/merge-config! atom-appender)
   (f))
 
@@ -15,11 +15,13 @@
 (defn contains-expected-tags? [event]
   (every? #(get (parse-string event) (name %)) expected-default-tags))
 
-(deftest init-logging-test
-  (testing "contains desired defaut tags"
+(deftest setup-loga-test
+  (testing "formats log event to contain desired default tags"
     (info "A log event")
-    (is (true? (contains-expected-tags? @log-event))))
-  (testing "appends tag to the log"
+    (is (true? (contains-expected-tags? @log-event)))))
+
+(deftest set-tag-test
+  (testing "appends tag to the log event"
     (let [tag "the-tag"]
       (set-tag tag
                (info "A tagged dummy event"))
