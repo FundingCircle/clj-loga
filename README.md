@@ -11,7 +11,7 @@ Library for custom log formatting and other helpers leveraging Timbre.
 
 ```bash
 #export env variable to apply formatting
-ENABLE_LOG_FORMAT=anything
+ENABLE_LOGA=true
 ```
 
 **Repl**
