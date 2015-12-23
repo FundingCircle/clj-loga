@@ -21,7 +21,7 @@ ENABLE_LOGA=true
 (require '[clj-loga.core :refer [init-logging set-tag]])
 
 ;; initialize formatter
-(init-logging)
+(setup-loga)
 
 ;; easily log with timbre
 (timbre/info "Log it out.")
