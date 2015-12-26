@@ -18,7 +18,7 @@ ENABLE_LOGA=true
 **Repl**
 
 ```clojure
-(require '[clj-loga.core :refer [init-logging set-tag]])
+(require '[clj-loga.core :refer [setup-loga set-tag]])
 
 ;; initialize formatter
 (setup-loga)
