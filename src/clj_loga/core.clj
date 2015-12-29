@@ -73,7 +73,7 @@
     (timbre/info "Skipping custom log formatter.")))
 
 (comment
-  (init-logging)
+  (setup-loga)
   (timbre/info "Log it out.")
   (set-tag "smart-tag"
            (timbre/info "Log it tagged."))
