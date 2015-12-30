@@ -18,7 +18,7 @@ ENABLE_LOGA=true
 **Repl**
 
 ```clojure
-(require '[clj-loga.core :refer [setup-loga set-tag]])
+(require '[clj-loga.core :refer [setup-loga set-log-tag operation-log-wrapper]])
 
 ;; initialize formatter
 (setup-loga)
@@ -27,11 +27,22 @@ ENABLE_LOGA=true
 (timbre/info "Log it out.")
 
 ;; tag logs
-(set-tag "smart-tag"
+(set-log-tag "smart-tag"
            (timbre/info "Log it tagged."))
 
 ;; handle exceptions
 (timbre/error (Exception. "Something went wrong"))
+
+;; Related forms can be grouped as an operation (e.g. event processing) and wrapped around with a log messages.
+;; - macro *operation-log-wrapper* requires a map with a name of the operation e.g. {:operation "a-operation"}
+;; - optional keys:
+;;   - :tag - to tag log events
+;;   - :pre-log-msg  - custom log message before body execution
+;;   - :post-log-msg - custom log message after body execution
+
+(operation-log-wrapper {:operation "processing message" :tag "smart-tag"}
+                         (do (prn "executing all the work") :return-value))
+
 ```
 
 ## Features in progress
@@ -39,16 +50,14 @@ ENABLE_LOGA=true
 Currently, user can set one tag which will be merged with the default format. It would be benefitial if user can log multiple information tags in the business flow. It allows more granular filtering in log aggreagation tools.
 
 ```clojure
-(set-tag "tracking-id" (:tracking-id msg) ;; (set-tag "tag-name" "tag-value")
-  (process-message msg)                   ;; every log will contain the `tracking-id` tag
-  (info "Finished processing message")) 
+(process-message msg)
 ```
 
 ###Log with tag - *once*
 Similar to multiple tags, but this will append the tag only to the specific log event. Next event will not include this tag.
 
 ```clojure
-(log-with-tag "Processing event" "tracking-id" (:tracking-id msg)) ;; (log-with-tag "message" "tag-name" "value")
+(set-log-tag "Processing event" "tracking-id" (:tracking-id msg)) ;; (set-log-tag "message" "tag-name" "value")
 ```
 
 ## License

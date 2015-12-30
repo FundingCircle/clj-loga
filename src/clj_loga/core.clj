@@ -1,17 +1,36 @@
 (ns clj-loga.core
-  (:require [taoensso.timbre :refer [errorf merge-config!] :as timbre]
-            [dire.core :refer [with-wrap-hook! with-pre-hook! with-post-hook!]]
-            [clojure.string :refer [upper-case join]]
-            [cheshire.core :refer [generate-string]]
-            [clj-time.format :as f]
-            [environ.core :refer [env]]))
+  (:require [cheshire.core :refer [generate-string]]
+            [clojure.string :refer [join upper-case]]
+            [environ.core :refer [env]]
+            [taoensso.timbre :as timbre :refer [errorf info merge-config!]]))
 
 (def ^:private ^:dynamic _tag nil)
 
-(defmacro set-tag
+(defmacro set-log-tag
   "Sets a tag, which is appended to the log event."
   [tag* & body]
-  `(binding [_tag ~tag*] ~@body))
+  `(binding [_tag ~tag*]
+     ~@body))
+
+(defmacro wrap-operation-with-log
+  [m & body]
+  `(let [operation# (:operation ~m)
+         pre-log-msg# (:pre-log-msg ~m)
+         post-log-msg# (:post-log-msg ~m)]
+    (info (str (or pre-log-msg# "started") operation#))
+    (let [result# ~@body]
+      (info (str (or post-log-msg# "finished") operation#))
+      result#)))
+
+(defmacro operation-log-wrapper
+  "Wrap function body with log before and after its execution.
+  Tag is applied if present.
+  - required keys: operation
+  - optional keys: pre-log-msg, post-log-msg and tag"
+  [m & body]
+  `(if-let [tag# (:tag ~m)]
+     (set-log-tag tag# (wrap-operation-with-log ~m ~@body))
+     (wrap-operation-with-log ~m ~@body)))
 
 (defn- get-tag []
   "Gets current _tag"
@@ -75,6 +94,9 @@
 (comment
   (setup-loga)
   (timbre/info "Log it out.")
-  (set-tag "smart-tag"
+  (set-log-tag "smart-tag"
            (timbre/info "Log it tagged."))
-  (timbre/error (Exception. "Something went wrong")))
+  (timbre/error (Exception. "Something went wrong"))
+  (operation-log-wrapper {:operation "processing message" :tag "some-tag"}
+                         (do (prn "all the work happening now") "return value"))
+  )
