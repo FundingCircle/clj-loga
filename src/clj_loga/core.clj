@@ -6,6 +6,18 @@
 
 (def ^:private ^:dynamic _tag nil)
 
+(defn log-with-tag [level args]
+  (timbre/log1-macro timbre/example-config level :p args))
+
+(defmacro log-with-tag [level & args]
+  `(timbre/log1-macro timbre/example-config ~level :p ~args))
+
+(comment
+  (info "hello")
+  (log-with-tag :warn "hello word")
+
+  )
+
 (defmacro set-log-tag
   "Sets a tag, which is appended to the log event."
   [tag* & body]
@@ -70,6 +82,14 @@
 (defn- exception-handler [throwable ^Thread thread]
   (errorf throwable "Uncaught exception on thread: %s"
           (.getName thread)))
+
+(defn- output-fn-with-tag
+  ([data] (output-fn-with-tag nil data))
+  ([opts data]
+   (-> (output-fn opts data)
+       (append-tag))
+   )
+  )
 
 (defn- output-fn
   ([data] (output-fn nil data))
