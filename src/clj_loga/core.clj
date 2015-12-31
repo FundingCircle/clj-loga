@@ -17,16 +17,19 @@
   `(let [operation# (:operation ~m)
          pre-log-msg# (:pre-log-msg ~m)
          post-log-msg# (:post-log-msg ~m)]
-    (info (str (or pre-log-msg# "started: ") operation#))
+    (info (str (or pre-log-msg# "started: ") (or operation# "")))
     (let [result# ~@body]
-      (info (str (or post-log-msg# "finished: ") operation#))
+      (info (str (or post-log-msg# "finished: ") (or operation# "")))
       result#)))
 
-(defmacro operation-log-wrapper
+(defmacro log-wrapper
   "Wrap function body with log before and after its execution.
   Tag is applied if present.
-  - required keys: operation
-  - optional keys: pre-log-msg, post-log-msg and tag"
+  - optional keys:
+    - tag - to tag log events
+    - pre-log-msg - custom log message before body execution
+    - :post-log-msg - custom log message after body execution
+    - :operation - descriptive name for the wrapped forms"
   [m & body]
   `(if-let [tag# (:tag ~m)]
      (set-log-tag tag# (wrap-operation-with-log ~m ~@body))
@@ -97,6 +100,8 @@
   (set-log-tag "smart-tag"
            (timbre/info "Log it tagged."))
   (timbre/error (Exception. "Something went wrong"))
-  (operation-log-wrapper {:operation "processing message" :tag "some-tag"}
+  (log-wrapper {:operation "processing message" :tag "some-tag"}
                          (do (prn "all the work happening now") "return value"))
+  (log-wrapper {:pre-log-msg "started processing kafka message" :post-log-msg "finished processing kafka message" :tag "message id"}
+               (do (prn "all the work happening now") "return value"))
   )

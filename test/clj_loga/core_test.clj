@@ -28,30 +28,30 @@
       (set-log-tag tag (info "A tagged dummy event"))
       (is (= tag (get-log-element (latest-log-event) "tag"))))))
 
-(deftest operation-log-wrapper-test
+(deftest log-wrapper-test
   (testing "logs 2 messages around the operation"
     (reset-log-events)
-    (operation-log-wrapper {:operation "a-operation"} "result")
+    (log-wrapper {:operation "a-operation"} "result")
     (is (= 2 (count @log-events))))
   (testing "tags log messages"
     (reset-log-events)
     (let [tag "the-tag"]
-      (operation-log-wrapper {:operation "a-operation" :tag tag} "result")
+      (log-wrapper {:operation "a-operation" :tag tag} "result")
       (is (every? #(= tag %) (map #(get-log-element % "tag")  @log-events)))))
   (testing "applies custom pre-log message"
     (reset-log-events)
     (let [msg "dummy log message"]
-      (operation-log-wrapper {:operation "a-operation" :pre-log-msg msg} "result")
+      (log-wrapper {:operation "a-operation" :pre-log-msg msg} "result")
       (is (.contains (get-log-element (earliest-log-event) "message") msg))))
   (testing "applies custom post-log message"
     (reset-log-events)
     (let [msg "dummy message"]
-      (operation-log-wrapper {:operation "a-operation" :post-log-msg msg} "result")
+      (log-wrapper {:operation "a-operation" :post-log-msg msg} "result")
       (is (.contains (get-log-element (latest-log-event) "message") msg))))
   (testing "returns result of wrapped body"
     (reset-log-events)
     (let [expected-result "result"
-          result (operation-log-wrapper {:operation "a-operation"} expected-result)]
+          result (log-wrapper {:operation "a-operation"} expected-result)]
       (is (= result expected-result)))))
 
 (use-fixtures :each log-to-atom)

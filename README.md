@@ -18,7 +18,7 @@ ENABLE_LOGA=true
 **Repl**
 
 ```clojure
-(require '[clj-loga.core :refer [setup-loga set-log-tag operation-log-wrapper]])
+(require '[clj-loga.core :refer [setup-loga set-log-tag log-wrapper]])
 
 ;; initialize formatter
 (setup-loga)
@@ -33,16 +33,35 @@ ENABLE_LOGA=true
 ;; handle exceptions
 (timbre/error (Exception. "Something went wrong"))
 
-;; Related forms can be grouped as an operation (e.g. event processing) and wrapped around with a log messages.
-;; - macro *operation-log-wrapper* requires a map with a name of the operation e.g. {:operation "a-operation"}
+;; Related forms can be wrapped with log messages.
+;; - macro log-wrapper accepts a map with following keys:
 ;; - optional keys:
 ;;   - :tag - to tag log events
 ;;   - :pre-log-msg  - custom log message before body execution
 ;;   - :post-log-msg - custom log message after body execution
+;;   - :operation - descriptive name for the wrapped forms
 
-(operation-log-wrapper {:operation "processing message" :tag "smart-tag"}
-                         (do (prn "executing all the work") :return-value))
+:: custom basic application:
+(log-wrapper {:pre-log-msg "started processing kafka message"
+              :post-log-msg "finished processing kafka message"
+              :tag "message id"}
+              (do
+                (prn "all the work happening now")
+                "return value"))
 
+;; =>
+;; {"timestamp":"2015-12-31T11:25:57.598Z","level":"INFO","message":"started processing kafka message","namespace":"clj-loga.core","tag":"message id"}
+;; "all the work happening now"
+;; {"timestamp":"2015-12-31T11:25:57.599Z","level":"INFO","message":"finished processing kafka message","namespace":"clj-loga.core","tag":"message id"}
+
+;; or use defaults:
+(log-wrapper {:operation "processing message" :tag "smart-tag"}
+             (do (prn "executing all the work") :return-value))
+
+;; =>
+;; {"timestamp":"2015-12-31T11:19:28.146Z","level":"INFO","message":"started: processing message","namespace":"clj-loga.core","tag":"some-tag"}
+;; '"all the work happening now"
+;; {"timestamp":"2015-12-31T11:19:28.150Z","level":"INFO","message":"finished: processing message","namespace":"clj-loga.core","tag":"some-tag"}
 ```
 
 ## Features in progress
