@@ -41,7 +41,7 @@ ENABLE_LOGA=true
 ;;   - :post-log-msg - custom log message after body execution
 ;;   - :operation - descriptive name for the wrapped forms
 
-:: custom basic application:
+;; custom basic application:
 (log-wrapper {:pre-log-msg "started processing kafka message"
               :post-log-msg "finished processing kafka message"
               :tag "message id"}
