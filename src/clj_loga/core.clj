@@ -83,12 +83,12 @@
         append-tag
         generate-string)))
 
-(def ^:private loga-enabled?
+(defn- loga-enabled? []
   (= (env :enable-loga) "true"))
 
 (defn setup-loga []
   "Initialize formatted logging."
-  (if loga-enabled?
+  (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
         (merge-config! {:output-fn output-fn
                         :timestamp-opts iso-timestamp-opts}))
@@ -97,8 +97,10 @@
 (comment
   (setup-loga)
   (timbre/info "Log it out.")
-  (set-log-tag "smart-tag"
-           (timbre/info "Log it tagged."))
+  (set-log-tag
+   "smart-tag"
+   (timbre/info "Log it tagged.")
+   (future (timbre/info "furure log")))
   (timbre/error (Exception. "Something went wrong"))
   (log-wrapper {:operation "processing message" :tag "some-tag"}
                          (do (prn "all the work happening now") "return value"))
