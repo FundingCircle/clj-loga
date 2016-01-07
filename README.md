@@ -25,6 +25,10 @@ ENABLE_LOGA=true
 ;; initialize formatter
 (setup-loga)
 
+;; by default the log level is set to INFO. Lower levels will not be logged
+;; - to specify custom log level pass it as a key value in setup
+(setup-loga :level :debug)
+
 ;; easily log with timbre
 (timbre/info "Log it out.")
 
