@@ -1,4 +1,4 @@
-(defproject clj-loga "0.2.2"
+(defproject clj-loga "0.2.3"
   :description "Library for custom log formatting and other helpers leveraging Timbre"
   :url "https://github.com/FundingCircle/clj-loga"
   :license {:name "Eclipse Public License"
