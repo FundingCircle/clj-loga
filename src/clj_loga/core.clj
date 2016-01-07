@@ -86,17 +86,18 @@
 (defn- loga-enabled? []
   (= (env :enable-loga) "true"))
 
-(defn setup-loga [& {:keys [level]}]
+(defn setup-loga [& {:keys [level]
+                     :or {level :info}}]
   "Initialize formatted logging."
   (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
         (merge-config! {:output-fn output-fn
                         :timestamp-opts iso-timestamp-opts
-                        :level (or level :info)}))
+                        :level level}))
     (timbre/info "Skipping custom log formatter.")))
 
 (comment
-  (setup-loga :level :info)
+  (setup-loga :level :debug)
   (timbre/info "Log it out.")
   (set-log-tag
    "smart-tag"
