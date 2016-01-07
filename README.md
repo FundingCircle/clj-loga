@@ -1,6 +1,8 @@
 # clj-loga [![Circle CI](https://circleci.com/gh/FundingCircle/clj-loga/tree/master.svg?style=svg)](https://circleci.com/gh/FundingCircle/clj-loga/tree/master)
 
-Library for custom log formatting and other helpers leveraging Timbre.
+Library for custom log formatting and other helpers leveraging [Timbre](https://github.com/ptaoussanis/timbre/).
+
+Supports logging with timbre >= 4.1.1.
 
 ## Usage
 
