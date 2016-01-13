@@ -5,12 +5,15 @@
             [clojure.test :refer :all]
             [taoensso.timbre :as timbre :refer [info]]))
 
-(defn- log-to-atom [f]
-  (setup-loga)
-  (timbre/merge-config! atom-appender)
-  (f))
 
 (def expected-default-tags [:timestamp :level :message :namespace])
+
+(def obfuscated-key :password)
+
+(defn- log-to-atom [f]
+  (setup-loga :obfuscate [obfuscated-key])
+  (timbre/merge-config! atom-appender)
+  (f))
 
 (defn- contains-expected-tags? [event]
   (every? #(get (parse-string event) (name %)) expected-default-tags))
@@ -19,7 +22,11 @@
   (testing "formats log event to contain desired default tags"
     (reset-log-events)
     (info "dummy log")
-    (is (true? (contains-expected-tags? (latest-log-event))))))
+    (is (true? (contains-expected-tags? (latest-log-event)))))
+  (testing "obfuscates specific keys"
+    (reset-log-events)
+    (info {:bar "baz" :password "secret"})
+    (is (= anonym-string (:password (read-string (get-log-element (latest-log-event) "message")))))))
 
 (deftest set-log-tag-test
   (testing "appends tag to the log event"

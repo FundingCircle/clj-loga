@@ -29,6 +29,16 @@ ENABLE_LOGA=true
 ;; - to specify custom log level pass it as a key value in setup
 (setup-loga :level :debug)
 
+;; obfuscate sensitive keys
+(setup-loga :obfuscate [:password])
+
+;; log worry-free
+(timbre/info "Log event with params"
+  {:password "secret" :bar "baz" :sub {:password "secret" :foo "bar"}})
+;; =>
+;; {"level":"INFO","timestamp":"2016-01-13T10:31:17.126Z","namespace":"clj-loga.core",
+;; "message":"Log event with params {:password \"[FILTERED]\", :bar \"baz\", :sub {:password \"[FILTERED]\", :foo \"bar\"}}"}"\"}\"}"}
+
 ;; easily log with timbre
 (timbre/info "Log it out.")
 
