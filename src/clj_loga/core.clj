@@ -1,10 +1,14 @@
 (ns clj-loga.core
   (:require [cheshire.core :refer [generate-string]]
-            [clojure.string :refer [join upper-case]]
+            [clojure
+             [string :refer [join upper-case]]
+             [walk :refer [postwalk]]]
             [environ.core :refer [env]]
             [taoensso.timbre :as timbre :refer [errorf info merge-config!]]))
 
 (def ^:private ^:dynamic _tag nil)
+
+(def anonym-string "[FILTERED]")
 
 (defmacro set-log-tag
   "Sets a tag, which is appended to the log event."
@@ -86,24 +90,40 @@
 (defn- loga-enabled? []
   (= (env :enable-loga) "true"))
 
-(defn setup-loga [& {:keys [level]
-                     :or {level :info}}]
+(defn obfuscate-key [m key-to-obfuscate]
+  (if (contains? m key-to-obfuscate)
+    (assoc m key-to-obfuscate anonym-string)
+    m))
+
+(defn obfuscate-data [data keys-to-obfuscate]
+  (postwalk
+   (fn [element]
+     (if (map? element) (reduce obfuscate-key element keys-to-obfuscate)
+         element))
+   data))
+
+(defn setup-loga
   "Initialize formatted logging."
+  [& {:keys [level obfuscate]
+      :or {level :info obfuscate []}}]
   (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
-        (merge-config! {:output-fn output-fn
+        (merge-config! {:middleware [(fn [{:keys [vargs_] :as data}]
+                                       (assoc data :vargs_ (delay (obfuscate-data @vargs_ obfuscate))))]
+                        :output-fn output-fn
                         :timestamp-opts iso-timestamp-opts
                         :level level}))
     (timbre/info "Skipping custom log formatter.")))
 
 (comment
+  (setup-loga :obfuscate [:password] :level :debug)
   (setup-loga :level :debug)
-  (timbre/info "Log it out.")
+  (timbre/info "Log event with params" {:password "secret" :bar "baz" :sub {:password "secret" :foo "bar"}})
   (set-log-tag
    "smart-tag"
    (timbre/info "Log it tagged.")
    (future (timbre/info "furure log")))
-  (timbre/error (Exception. "Something went wrong"))
+  (timbre/error (Exception. "Something went wrong") "error")
   (log-wrapper {:operation "processing message" :tag "some-tag"}
                          (do (prn "all the work happening now") "return value"))
   (log-wrapper {:pre-log-msg "started processing kafka message" :post-log-msg "finished processing kafka message" :tag "message id"}
