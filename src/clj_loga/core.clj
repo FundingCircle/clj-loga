@@ -3,7 +3,14 @@
             [clojure
              [string :refer [join upper-case]]
              [walk :refer [postwalk]]]
+            [clj-loga.hooks
+             :refer
+             [format-pre-log-msg
+              get-namespaces-from-list
+              select-loga-keys
+              target-functions-from-namespaces]]
             [environ.core :refer [env]]
+            [robert.hooke :refer [add-hook]]
             [taoensso.timbre :as timbre :refer [errorf info merge-config!]]))
 
 (def ^:private ^:dynamic _tag nil)
@@ -102,12 +109,21 @@
          element))
    data))
 
+(defn set-loga-hooks [namespaces]
+  (doseq [function (-> namespaces
+                       get-namespaces-from-list
+                       target-functions-from-namespaces)]
+     (add-hook function (fn [f & args]
+                          (let [meta-args (-> (meta function) select-loga-keys (format-pre-log-msg args))]
+                            (log-wrapper meta-args (apply f args)))))))
+
 (defn setup-loga
   "Initialize formatted logging."
-  [& {:keys [level obfuscate]
-      :or {level :info obfuscate []}}]
+  [& {:keys [level namespaces obfuscate]
+                     :or {level :info namespaces [] obfuscate []}}]
   (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
+        (set-loga-hooks namespaces)
         (merge-config! {:middleware [(fn [{:keys [vargs_] :as data}]
                                        (assoc data :vargs_ (delay (obfuscate-data @vargs_ obfuscate))))]
                         :output-fn output-fn

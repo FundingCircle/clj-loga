@@ -9,6 +9,7 @@
                  [com.taoensso/timbre "4.1.1"]                                   ;; Logging and profiling
                  [dire "0.5.3"]                                                  ;; Hooks
                  [environ "0.5.0"]                                               ;; Environment variables
+                 [robert/hooke "1.3.0"]
                  ]
   :plugins [[lein-cljfmt  "0.3.0"]
             [lein-environ "1.0.1"]]
