@@ -1,14 +1,15 @@
 (ns clj-loga.core
   (:require [cheshire.core :refer [generate-string]]
-            [clojure
-             [string :refer [join upper-case]]
-             [walk :refer [postwalk]]]
             [clj-loga.hooks
              :refer
-             [format-pre-log-msg
+             [default-namespace
+              format-pre-log-msg
               get-namespaces-from-list
               select-loga-keys
               target-functions-from-namespaces]]
+            [clojure
+             [string :refer [join upper-case]]
+             [walk :refer [postwalk]]]
             [environ.core :refer [env]]
             [robert.hooke :refer [add-hook]]
             [taoensso.timbre :as timbre :refer [errorf info merge-config!]]))
@@ -28,10 +29,10 @@
   `(let [operation# (:operation ~m)
          pre-log-msg# (:pre-log-msg ~m)
          post-log-msg# (:post-log-msg ~m)]
-    (info (str (or pre-log-msg# "started: ") (or operation# "")))
-    (let [result# ~@body]
-      (info (str (or post-log-msg# "finished: ") (or operation# "")))
-      result#)))
+     (info (str (or pre-log-msg# "started: ") (or operation# "")))
+     (let [result# ~@body]
+       (info (str (or post-log-msg# "finished: ") (or operation# "")))
+       result#)))
 
 (defmacro log-wrapper
   "Wrap function body with log before and after its execution.
@@ -59,7 +60,7 @@
 (defn- append-stacktrace* [{:keys [?err_ opts]} m]
   (if-not (:no-stacktrace? opts)
     (when-let [err (force ?err_)]
-             (assoc m :stacktrace (str (format-stacktrace err opts))))))
+      (assoc m :stacktrace (str (format-stacktrace err opts))))))
 
 (defn- append-stacktrace [data m]
   "If stacktrace is present in data, returns log event with stacktrace
@@ -113,14 +114,16 @@
   (doseq [function (-> namespaces
                        get-namespaces-from-list
                        target-functions-from-namespaces)]
-     (add-hook function (fn [f & args]
-                          (let [meta-args (-> (meta function) select-loga-keys (format-pre-log-msg args))]
-                            (log-wrapper meta-args (apply f args)))))))
+    (add-hook function :loga-hook
+              (fn [f & args]
+                (let [meta-args (-> (meta function) select-loga-keys (format-pre-log-msg args))]
+                  (prn "hook args" meta-args)
+                  (log-wrapper meta-args (apply f args)))))))
 
 (defn setup-loga
   "Initialize formatted logging."
   [& {:keys [level namespaces obfuscate]
-                     :or {level :info namespaces [] obfuscate []}}]
+      :or {level :info namespaces [(default-namespace *ns*)] obfuscate []}}]
   (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
         (set-loga-hooks namespaces)
@@ -132,6 +135,7 @@
     (timbre/info "Skipping custom log formatter.")))
 
 (comment
+
   (setup-loga :obfuscate [:password] :level :debug)
   (setup-loga :level :debug)
   (timbre/info "Log event with params" {:password "secret" :bar "baz" :sub {:password "secret" :foo "bar"}})
@@ -141,7 +145,6 @@
    (future (timbre/info "furure log")))
   (timbre/error (Exception. "Something went wrong") "error")
   (log-wrapper {:operation "processing message" :tag "some-tag"}
-                         (do (prn "all the work happening now") "return value"))
-  (log-wrapper {:pre-log-msg "started processing kafka message" :post-log-msg "finished processing kafka message" :tag "message id"}
                (do (prn "all the work happening now") "return value"))
-  )
+  (log-wrapper {:pre-log-msg "started processing kafka message" :post-log-msg "finished processing kafka message" :tag "message id"}
+               (do (prn "all the work happening now") "return value")))

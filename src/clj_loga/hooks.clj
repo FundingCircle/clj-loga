@@ -3,13 +3,20 @@
 
 (defn- filter-namespace
   [item]
-  (filter #(re-find (re-pattern item) (str %)) (all-ns)))
+  (let [formatted-item (format "^%s" item)]
+    (filter #(re-find (re-pattern formatted-item) (str %)) (all-ns))))
+
+(defn default-namespace [target-namespace]
+  (-> target-namespace
+      str
+      (clojure.string/split #"\.")
+      first))
 
 (defn get-namespaces-from-list
   "Gets an expanded list of namespaces from a list
 
    (get-namespaces-from-list ['clj-loga.*])
-   => [clj-loga.support.functions clj-loga.core clj-loga.test]
+   => #{clj-loga.support.functions clj-loga.core clj-loga.test}
   "
   [namespaces-list]
   (reduce
@@ -33,5 +40,6 @@
       (select-keys [:operation :tag :pre-log-msg :post-log-msg])))
 
 (defn format-pre-log-msg [meta args]
-  (assoc meta :pre-log-msg (apply format (:pre-log-msg meta) args)))
-
+  (if-let [pre-log-msg (:pre-log-msg meta)]
+    (assoc meta :pre-log-msg (apply format pre-log-msg args))
+    meta))

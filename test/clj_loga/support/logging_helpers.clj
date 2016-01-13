@@ -37,5 +37,4 @@
 (comment
   @log-events
   (store-event "a-event")
-  (reset-log-events)
-  )
+  (reset-log-events))
