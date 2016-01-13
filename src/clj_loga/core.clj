@@ -117,10 +117,16 @@
                           (let [meta-args (-> (meta function) select-loga-keys (format-pre-log-msg args))]
                             (log-wrapper meta-args (apply f args)))))))
 
+(defn- current-ns-pattern []
+  (let [components (clojure.string/split (str (ns-name *ns*)) #"\.")
+        components(if (= 1 (count components)) components (drop-last components))
+        components (clojure.string/join "\\." components)]
+    (str "^" components "(\\..+)*$")))
+
 (defn setup-loga
   "Initialize formatted logging."
   [& {:keys [level namespaces obfuscate]
-                     :or {level :info namespaces [] obfuscate []}}]
+      :or {level :info namespaces [(current-ns-pattern)] obfuscate []}}]
   (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
         (set-loga-hooks namespaces)

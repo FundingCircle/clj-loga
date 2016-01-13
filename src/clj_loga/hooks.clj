@@ -3,7 +3,7 @@
 
 (defn- filter-namespace
   [item]
-  (filter #(re-find (re-pattern item) (str %)) (all-ns)))
+  (filter #(re-find (re-pattern item) (str (ns-name %))) (all-ns)))
 
 (defn get-namespaces-from-list
   "Gets an expanded list of namespaces from a list
@@ -34,4 +34,3 @@
 
 (defn format-pre-log-msg [meta args]
   (assoc meta :pre-log-msg (apply format (:pre-log-msg meta) args)))
-
