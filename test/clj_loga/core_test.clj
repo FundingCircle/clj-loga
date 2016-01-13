@@ -61,4 +61,19 @@
           result (log-wrapper {:operation "a-operation"} expected-result)]
       (is (= result expected-result)))))
 
+(deftest current-ns-pattern-test
+  (let [current-ns-pattern #'clj-loga.core/current-ns-pattern
+        ;; test cases
+        current-ns-name (-> *ns* ns-name str)
+        sub-current-ns-name (str current-ns-name ".foo.bar")
+        incorrect-ns-name (str "prefix." sub-current-ns-name)]
+
+    (letfn [(matches [ns should-pass]
+              (is ((if should-pass identity not)
+                   (re-matches (re-pattern (current-ns-pattern)) ns))))]
+
+      (matches current-ns-name true)
+      (matches sub-current-ns-name true)
+      (matches incorrect-ns-name false))))
+
 (use-fixtures :each log-to-atom)
