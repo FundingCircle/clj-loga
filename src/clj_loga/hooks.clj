@@ -1,5 +1,6 @@
 (ns clj-loga.hooks
-  (:require [clojure.set :refer [rename-keys]]))
+  (:require [clojure.set :refer [rename-keys]]
+            [taoensso.timbre :refer [info]]))
 
 (defn- filter-namespace
   [item]
@@ -41,5 +42,5 @@
 
 (defn format-pre-log-msg [meta args]
   (if-let [pre-log-msg (:pre-log-msg meta)]
-    (assoc meta :pre-log-msg (apply format pre-log-msg args))
+    (assoc meta :pre-log-msg (fn [] (info pre-log-msg (into [] args))))
     meta))

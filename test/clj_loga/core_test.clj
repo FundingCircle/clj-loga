@@ -61,19 +61,20 @@
       (is (= result expected-result)))))
 
 (defn create-loga-decorated-function! [ns-name]
-  (let [decorated-fn (with-meta 'decor {:clj-loga/tag [1] :clj-loga/operation "processing..."})
+  (let [decorated-fn (with-meta 'decor {:clj-loga/tag [1] :clj-loga/pre-log-msg "start" :clj-loga/operation "processing..."})
         ns-name-symbol (symbol ns-name)]
     (create-ns ns-name-symbol)
-    (intern ns-name-symbol decorated-fn (fn [] (prn "test hook")))))
+    (intern ns-name-symbol decorated-fn (fn [ & args] (prn "test hook")))))
 
 (deftest set-loga-hooks-test
   (testing "sets hooks in decorated functions with loga metadata"
     (reset-log-events)
     (create-loga-decorated-function! "clj-loga.ephemeral")
     (set-loga-hooks ["clj-loga.ephemeral"])
-    (apply (resolve 'clj-loga.ephemeral/decor) [])
+    (apply (resolve 'clj-loga.ephemeral/decor) {:a 1 :password "secret"})
 
     (is (= (get-log-element (latest-log-event) "tag") [1]))
+    (is (.contains (get-log-element (earliest-log-event) "message") "FILTERED"))
     (is (.contains (get-log-element (latest-log-event) "message") "processing..."))))
 
 (use-fixtures :each log-to-atom)

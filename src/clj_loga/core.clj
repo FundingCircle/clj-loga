@@ -29,7 +29,9 @@
   `(let [operation# (:operation ~m)
          pre-log-msg# (:pre-log-msg ~m)
          post-log-msg# (:post-log-msg ~m)]
-     (info (str (or pre-log-msg# "started: ") (or operation# "")))
+     (if (fn? pre-log-msg#)
+       (do (pre-log-msg#) (info (or operation# "")))
+       (info (str (or pre-log-msg# "started: ") (or operation# ""))))
      (let [result# ~@body]
        (info (str (or post-log-msg# "finished: ") (or operation# "")))
        result#)))
@@ -103,11 +105,18 @@
     (assoc m key-to-obfuscate anonym-string)
     m))
 
+(defn obfuscate-vector-key [m key-to-obfuscate]
+  (if (and (= (count m) 2) (= key-to-obfuscate (first m)))
+    [key-to-obfuscate anonym-string]
+    m))
+
 (defn obfuscate-data [data keys-to-obfuscate]
   (postwalk
    (fn [element]
-     (if (map? element) (reduce obfuscate-key element keys-to-obfuscate)
-         element))
+     (cond
+       (map? element) (reduce obfuscate-key element keys-to-obfuscate)
+       (vector? element) (reduce obfuscate-vector-key element keys-to-obfuscate)
+       :else element))
    data))
 
 (defn set-loga-hooks [namespaces]
@@ -116,8 +125,8 @@
                        target-functions-from-namespaces)]
     (add-hook function :loga-hook
               (fn [f & args]
-                (let [meta-args (-> (meta function) select-loga-keys (format-pre-log-msg args))]
-                  (prn "hook args" meta-args)
+                (let [fn-metada (meta function)
+                      meta-args (-> fn-metada select-loga-keys (format-pre-log-msg args))]
                   (log-wrapper meta-args (apply f args)))))))
 
 (defn setup-loga
@@ -135,7 +144,6 @@
     (timbre/info "Skipping custom log formatter.")))
 
 (comment
-
   (setup-loga :obfuscate [:password] :level :debug)
   (setup-loga :level :debug)
   (timbre/info "Log event with params" {:password "secret" :bar "baz" :sub {:password "secret" :foo "bar"}})
