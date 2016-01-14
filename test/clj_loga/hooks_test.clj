@@ -18,7 +18,7 @@
 
 (def expected-fn-data
   (doall
-   (map (fn [x] (let [fn (with-meta 'fn {:clj-loga/operation "operation test" :clj-loga/tag [1]})]
+   (map (fn [x] (let [fn (with-meta 'fn {::sut/operation "operation test" ::sut/tag [1]})]
                   (intern x fn (fn [] nil)))) expected-ns-data)))
 
 (deftest target-functions-from-namespaces
@@ -30,6 +30,6 @@
 
 (deftest select-loga-keys-test
   (testing "renames ns prepended loga keys"
-    (is (= (sut/select-loga-keys {:clj-loga/tag [1] :clj-loga/operation "operation"}) {:tag [1] :operation "operation"})))
+    (is (= (sut/select-loga-keys {::sut/tag [1] ::sut/operation "operation"}) {:tag [1] :operation "operation"})))
   (testing "selects only loga keys"
-    (is (= (sut/select-loga-keys {:clj-loga/tag [1] :clj-loga/operation "op" :other false}) {:tag [1] :operation "op"}))))
+    (is (= (sut/select-loga-keys {::sut/tag [1] ::sut/operation "op" :other false}) {:tag [1] :operation "op"}))))

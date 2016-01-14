@@ -29,15 +29,16 @@
 (defn target-functions-from-namespaces
   "Gets a list of all the functions that contains loga's related metadata"
   [namespaces]
-  (let [loga-meta-keys #{:clj-loga/operation :clj-loga/tag :clj-loga/pre-log-msg :clj-loga/post-log-msg}
+  (let [loga-meta-keys #{::operation ::tag ::pre-log-msg ::post-log-msg}
         all-functions (mapcat #(-> % ns-interns vals) namespaces)]
     (filter #(some loga-meta-keys (keys (meta %))) all-functions)))
 
 (defn select-loga-keys [meta]
-  (-> meta (rename-keys {:clj-loga/tag :tag
-                         :clj-loga/operation :operation
-                         :clj-loga/pre-log-msg :pre-log-msg
-                         :clj-loga/post-log-msg :post-log-msg})
+  (prn "select-loga" meta)
+  (-> meta (rename-keys {::tag :tag
+                         ::operation :operation
+                         ::pre-log-msg :pre-log-msg
+                         ::post-log-msg :post-log-msg})
       (select-keys [:operation :tag :pre-log-msg :post-log-msg])))
 
 (defn format-pre-log-msg [meta args]

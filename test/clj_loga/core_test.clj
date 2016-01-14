@@ -1,6 +1,7 @@
 (ns clj-loga.core-test
   (:require [cheshire.core :refer [parse-string]]
             [clj-loga.core :refer :all]
+            [clj-loga.hooks :as h]
             [clj-loga.support.logging-helpers :refer :all]
             [clojure.test :refer :all]
             [taoensso.timbre :as timbre :refer [info]]))
@@ -61,7 +62,7 @@
       (is (= result expected-result)))))
 
 (defn create-loga-decorated-function! [ns-name]
-  (let [decorated-fn (with-meta 'decor {:clj-loga/tag [1] :clj-loga/pre-log-msg "start" :clj-loga/operation "processing..."})
+  (let [decorated-fn (with-meta 'decor {::h/tag [1] ::h/pre-log-msg "start" ::h/operation "processing..."})
         ns-name-symbol (symbol ns-name)]
     (create-ns ns-name-symbol)
     (intern ns-name-symbol decorated-fn (fn [ & args] (prn "test hook")))))
