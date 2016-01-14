@@ -14,7 +14,10 @@
 (deftest get-namespaces-from-list-test
   (testing "expands pattern list"
     (with-redefs [all-ns (constantly all-ns-mock)]
-      (is (= (sut/get-namespaces-from-list ["expected-ns.*"]) (into #{} expected-ns-data))))))
+      (is (= (sut/get-namespaces-from-list ["expected-ns.*"]) expected-ns-data))))
+  (testing "defaults to all loaded namespaces"
+    (with-redefs [all-ns (constantly all-ns-mock)]
+      (is (= (sut/get-namespaces-from-list [:all]) all-ns-mock)))))
 
 (def expected-fn-data
   (doall

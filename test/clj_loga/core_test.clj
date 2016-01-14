@@ -65,7 +65,7 @@
   (let [decorated-fn (with-meta 'decor {::h/tag [1] ::h/pre-log-msg "start" ::h/operation "processing..."})
         ns-name-symbol (symbol ns-name)]
     (create-ns ns-name-symbol)
-    (intern ns-name-symbol decorated-fn (fn [ & args] (prn "test hook")))))
+    (intern ns-name-symbol decorated-fn (fn [& args] (prn "test hook")))))
 
 (deftest set-loga-hooks-test
   (testing "sets hooks in decorated functions with loga metadata"

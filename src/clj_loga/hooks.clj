@@ -7,12 +7,6 @@
   (let [formatted-item (format "^%s" item)]
     (filter #(re-find (re-pattern formatted-item) (str %)) (all-ns))))
 
-(defn default-namespace [target-namespace]
-  (-> target-namespace
-      str
-      (clojure.string/split #"\.")
-      first))
-
 (defn get-namespaces-from-list
   "Gets an expanded list of namespaces from a list
 
@@ -20,11 +14,13 @@
    => #{clj-loga.support.functions clj-loga.core clj-loga.test}
   "
   [namespaces-list]
-  (reduce
-   (fn [acum item]
-     (reduce conj acum (filter-namespace item)))
-   #{}
-   namespaces-list))
+  (if (= (first namespaces-list) :all)
+    (all-ns)
+    (seq (reduce
+      (fn [acum item]
+        (reduce conj acum (filter-namespace item)))
+      #{}
+      namespaces-list))))
 
 (defn target-functions-from-namespaces
   "Gets a list of all the functions that contains loga's related metadata"
@@ -34,7 +30,6 @@
     (filter #(some loga-meta-keys (keys (meta %))) all-functions)))
 
 (defn select-loga-keys [meta]
-  (prn "select-loga" meta)
   (-> meta (rename-keys {::tag :tag
                          ::operation :operation
                          ::pre-log-msg :pre-log-msg

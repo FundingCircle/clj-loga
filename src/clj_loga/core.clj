@@ -2,8 +2,7 @@
   (:require [cheshire.core :refer [generate-string]]
             [clj-loga.hooks
              :refer
-             [default-namespace
-              format-pre-log-msg
+             [format-pre-log-msg
               get-namespaces-from-list
               select-loga-keys
               target-functions-from-namespaces]]
@@ -132,7 +131,7 @@
 (defn setup-loga
   "Initialize formatted logging."
   [& {:keys [level namespaces obfuscate]
-      :or {level :info namespaces [(default-namespace *ns*)] obfuscate []}}]
+      :or {level :info namespaces [:all] obfuscate []}}]
   (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
         (set-loga-hooks namespaces)
