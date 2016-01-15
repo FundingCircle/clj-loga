@@ -11,13 +11,16 @@
 (def all-ns-mock
   (concat expected-ns-data unexpected-ns-data))
 
+(defn- extract-ns-names [ns-list]
+  (sort (map ns-name ns-list)))
+
 (deftest get-namespaces-from-list-test
   (testing "expands pattern list"
     (with-redefs [all-ns (constantly all-ns-mock)]
-      (is (= (sut/get-namespaces-from-list ["expected-ns.*"]) expected-ns-data))))
+      (is (= (extract-ns-names (sut/get-namespaces-from-list ["expected-ns.*"])) (extract-ns-names expected-ns-data)))))
   (testing "defaults to all loaded namespaces"
     (with-redefs [all-ns (constantly all-ns-mock)]
-      (is (= (sut/get-namespaces-from-list [:all]) all-ns-mock)))))
+      (is (= (extract-ns-names (sut/get-namespaces-from-list [:all])) (extract-ns-names all-ns-mock))))))
 
 (def expected-fn-data
   (doall

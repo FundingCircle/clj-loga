@@ -79,6 +79,37 @@ ENABLE_LOGA=true
 ;; '"all the work happening now"
 ;; {"timestamp":"2015-12-31T11:19:28.150Z","level":"INFO","message":"finished: processing message","namespace":"clj-loga.core","tag":"some-tag"}
 ```
+**AOP logging with function metadata**
+
+As an alternative, it is possible to use function metadata to log instead of cluttering the code with explicit logging calls. By default, the library will search in all the namespaces for target functions.
+
+```Clojure
+(require [clj-loga.hooks :as h])
+
+(defn ^{::h/operation "executing function" ::h/tag "some-tag"}
+    my-target-function [argument]
+    (prn "hello from target function"))
+
+(my-target-function "test")
+;; =>
+;; {"timestamp":"2015-12-31T11:19:28.146Z","level":"INFO","message":"started: executing function","namespace":"clj-loga.core","tag":"some-tag"}
+;; '"hello from target function"
+;; {"timestamp":"2015-12-31T11:19:28.150Z","level":"INFO","message":"finished: executing function","namespace":"clj-loga.core","tag":"some-tag"}
+
+(defn ^{::h/pre-log-msg "executing function" ::h/post-log-msg "finished" ::h/tag "some-tag"}
+    another-target-function [argument]
+    (prn "target function logging arguments"))
+
+(another-target-function {:a 1 :b 2})
+;; =>
+;; {"timestamp":"2015-12-31T11:19:28.146Z","level":"INFO","message":"executing function {:a 1 :b 2}","namespace":"clj-loga.core","tag":"some-tag"}
+;; '"target function logging arguments"
+;; {"timestamp":"2015-12-31T11:19:28.150Z","level":"INFO","message":"finished","namespace":"clj-loga.core","tag":"some-tag"}
+
+;; narrow down target function search by specifying the namespaces
+(setup-loga :level :debug :namespaces ["my-ns.*" "another-ns.core"])
+
+```
 
 ## Features in progress
 ### Multiple tags
