@@ -1,9 +1,16 @@
 (ns clj-loga.core
   (:require [cheshire.core :refer [generate-string]]
+            [clj-loga.hooks
+             :refer
+             [format-pre-log-msg
+              get-namespaces-from-list
+              select-loga-keys
+              target-functions-from-namespaces]]
             [clojure
              [string :refer [join upper-case]]
              [walk :refer [postwalk]]]
             [environ.core :refer [env]]
+            [robert.hooke :refer [add-hook]]
             [taoensso.timbre :as timbre :refer [errorf info merge-config!]]))
 
 (def ^:private ^:dynamic _tag nil)
@@ -21,10 +28,12 @@
   `(let [operation# (:operation ~m)
          pre-log-msg# (:pre-log-msg ~m)
          post-log-msg# (:post-log-msg ~m)]
-    (info (str (or pre-log-msg# "started: ") (or operation# "")))
-    (let [result# ~@body]
-      (info (str (or post-log-msg# "finished: ") (or operation# "")))
-      result#)))
+     (if (fn? pre-log-msg#)
+       (do (pre-log-msg#) (info (or operation# "")))
+       (info (str (or pre-log-msg# "started: ") (or operation# ""))))
+     (let [result# ~@body]
+       (info (str (or post-log-msg# "finished: ") (or operation# "")))
+       result#)))
 
 (defmacro log-wrapper
   "Wrap function body with log before and after its execution.
@@ -52,7 +61,7 @@
 (defn- append-stacktrace* [{:keys [?err_ opts]} m]
   (if-not (:no-stacktrace? opts)
     (when-let [err (force ?err_)]
-             (assoc m :stacktrace (str (format-stacktrace err opts))))))
+      (assoc m :stacktrace (str (format-stacktrace err opts))))))
 
 (defn- append-stacktrace [data m]
   "If stacktrace is present in data, returns log event with stacktrace
@@ -95,19 +104,37 @@
     (assoc m key-to-obfuscate anonym-string)
     m))
 
+(defn obfuscate-vector-key [m key-to-obfuscate]
+  (if (and (= (count m) 2) (= key-to-obfuscate (first m)))
+    [key-to-obfuscate anonym-string]
+    m))
+
 (defn obfuscate-data [data keys-to-obfuscate]
   (postwalk
    (fn [element]
-     (if (map? element) (reduce obfuscate-key element keys-to-obfuscate)
-         element))
+     (cond
+       (map? element) (reduce obfuscate-key element keys-to-obfuscate)
+       (vector? element) (reduce obfuscate-vector-key element keys-to-obfuscate)
+       :else element))
    data))
+
+(defn set-loga-hooks [namespaces]
+  (doseq [function (-> namespaces
+                       get-namespaces-from-list
+                       target-functions-from-namespaces)]
+    (add-hook function :loga-hook
+              (fn [f & args]
+                (let [fn-metada (meta function)
+                      meta-args (-> fn-metada select-loga-keys (format-pre-log-msg args))]
+                  (log-wrapper meta-args (apply f args)))))))
 
 (defn setup-loga
   "Initialize formatted logging."
-  [& {:keys [level obfuscate]
-      :or {level :info obfuscate []}}]
+  [& {:keys [level namespaces obfuscate]
+      :or {level :info namespaces [:all] obfuscate []}}]
   (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
+        (set-loga-hooks namespaces)
         (merge-config! {:middleware [(fn [{:keys [vargs_] :as data}]
                                        (assoc data :vargs_ (delay (obfuscate-data @vargs_ obfuscate))))]
                         :output-fn output-fn
@@ -125,7 +152,6 @@
    (future (timbre/info "furure log")))
   (timbre/error (Exception. "Something went wrong") "error")
   (log-wrapper {:operation "processing message" :tag "some-tag"}
-                         (do (prn "all the work happening now") "return value"))
-  (log-wrapper {:pre-log-msg "started processing kafka message" :post-log-msg "finished processing kafka message" :tag "message id"}
                (do (prn "all the work happening now") "return value"))
-  )
+  (log-wrapper {:pre-log-msg "started processing kafka message" :post-log-msg "finished processing kafka message" :tag "message id"}
+               (do (prn "all the work happening now") "return value")))
