@@ -97,7 +97,7 @@
         generate-string)))
 
 (defn- loga-enabled? []
-  (= (env :enable-loga) "true"))
+  (not (= (:disable-loga env) "true")))
 
 (defn obfuscate-key [m key-to-obfuscate]
   (if (contains? m key-to-obfuscate)
