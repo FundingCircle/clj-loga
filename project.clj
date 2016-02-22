@@ -1,4 +1,4 @@
-(defproject clj-loga "0.4.0"
+(defproject clj-loga "0.4.1"
   :description "Library for custom log formatting and other helpers leveraging Timbre"
   :url "https://github.com/FundingCircle/clj-loga"
   :license {:name "Eclipse Public License"
@@ -11,5 +11,4 @@
                  [robert/hooke "1.3.0"]                                          ;; Hooks
                  ]
   :plugins [[lein-cljfmt  "0.3.0"]
-            [lein-environ "1.0.1"]]
-  :profiles {:test {:env {:enable-loga "true"}}})
+            [lein-environ "1.0.1"]])

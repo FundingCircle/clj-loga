@@ -1,24 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [Unreleased][unreleased]
-### Changed
-- Add a new arity to `make-widget-async` to provide a different widget shape.
+## 0.4.1 - 2016-02-22
 
-## [0.1.1] - 2015-12-21
-### Changed
-- Documentation on how to make the widgets.
+Changed:
+- ENABLE_LOGA environment variable is no longer needed for loga to work.
 
-### Removed
-- `make-widget-sync` - we're all async, all the time.
+Added:
+- DISABLE_LOGA environment variable can be used to disbale loga when it's set to `true`.
 
-### Fixed
-- Fixed widget maker to keep working when daylight savings switches over.
-
-## 0.1.0 - 2015-12-21
-### Added
-- Files from the new template.
-- Widget maker public API - `make-widget-sync`.
-
-[unreleased]: https://github.com/your-name/clj-loga/compare/0.1.1...HEAD
-[0.1.1]: https://github.com/your-name/clj-loga/compare/0.1.0...0.1.1
