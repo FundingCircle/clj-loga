@@ -1,6 +1,11 @@
 # clj-loga [![Circle CI](https://circleci.com/gh/FundingCircle/clj-loga/tree/master.svg?style=svg)](https://circleci.com/gh/FundingCircle/clj-loga/tree/master)
 
-Library for custom log formatting and other helpers leveraging [Timbre](https://github.com/ptaoussanis/timbre/).
+Standing on the shoulders of great logging library [Timbre](https://github.com/ptaoussanis/timbre/), loga extends Timbre's functionality with applying following features:
+- custom json log appender
+- tagging log messages
+- obfuscation
+
+Loga also provides wrappers around Timbre's logging macros to allow logging directly from the library. It removes the need to use timbre in the application directly, thus reduces risk of conflicts between version of Timbre used in Logs and in the application.
 
 Supports logging with timbre >= 4.1.1.
 
@@ -20,7 +25,7 @@ ENABLE_LOGA=true
 **Repl**
 
 ```clojure
-(require '[clj-loga.core :refer [setup-loga set-log-tag log-wrapper]])
+(require '[clj-loga.core :as loga :refer [setup-loga set-log-tag log-wrapper]])
 
 ;; initialize formatter
 (setup-loga)
@@ -28,6 +33,11 @@ ENABLE_LOGA=true
 ;; by default the log level is set to INFO. Lower levels will not be logged
 ;; - to specify custom log level pass it as a key value in setup
 (setup-loga :level :debug)
+
+;; Logging using Loga
+;; supported levels:
+;;   - log trace debug info warn error fatal
+(loga/info "my log message")
 
 ;; obfuscate sensitive keys
 (setup-loga :obfuscate [:password])
@@ -108,7 +118,6 @@ As an alternative, it is possible to use function metadata to log instead of clu
 
 ;; narrow down target function search by specifying the namespaces
 (setup-loga :level :debug :namespaces ["my-ns.*" "another-ns.core"])
-
 ```
 
 ## Features in progress
