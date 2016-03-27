@@ -3,4 +3,5 @@ All notable changes to this project will be documented in this file. This change
 
 ## [0.5.0] - 27/03/2016
 ###Added
-Enabled logging using loga directly providing wrappers around Timbre's logging macros. Supported log levels are: `:log, :trace, :debug, :info, :warn, :error, :fatal, :report`
+1. Enabled logging using loga directly providing wrappers around Timbre's logging macros. Supported log levels are: `:log, :trace, :debug, :info, :warn, :error, :fatal, :report`
+0. Bump up Timbre version.
