@@ -1,28 +1,29 @@
 # clj-loga [![Circle CI](https://circleci.com/gh/FundingCircle/clj-loga/tree/master.svg?style=svg)](https://circleci.com/gh/FundingCircle/clj-loga/tree/master)
 
-Standing on the shoulders of great logging library [Timbre](https://github.com/ptaoussanis/timbre/), loga extends Timbre's functionality with applying following features:
-- custom json log appender
-- tagging log messages
-- obfuscation
+Standing on the shoulders of the great logging library [Timbre](https://github.com/ptaoussanis/timbre/), loga extends Timbre's functionality by applying following features:
+- custom json log appender - allows convenient way of parsing logs for log aggregators
+- tagging log messages - allows to aggregate and track log events across multiple services based on the log
+- obfuscation - prevent sensitive data to be readable in logs
 
-Loga also provides wrappers around Timbre's logging macros to allow logging directly from the library. It removes the need to use timbre in the application directly, thus reduces risk of conflicts between version of Timbre used in Logs and in the application.
+Loga also provides wrappers around Timbre's logging macros to allow logging directly from the library. It removes the need to use Timbre in the application directly, thus reducing risk of conflicts between version of Timbre used in Logs and in the application.
 
-Supports logging with timbre >= 4.1.1.
+Supports Timbre >= 4.1.1.
 
 ## Usage
 
-**Installation**
+### Installation
 
 [![Clojars Project](http://clojars.org/clj-loga/latest-version.svg)](http://clojars.org/clj-loga)
 
-**Environment**
+### Environment
+Loga features are mainly to benefit logging aggregators and its use makes logs less readable and inconvenient in development. Hence, it is required to allow loga explicitly.
 
 ```bash
-#export env variable to apply formatting
+# export env variable to apply formatting
 ENABLE_LOGA=true
 ```
 
-**Repl**
+### REPL
 
 ```clojure
 (require '[clj-loga.core :as loga :refer [setup-loga set-log-tag log-wrapper]])
