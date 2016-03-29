@@ -11,7 +11,7 @@
              [walk :refer [postwalk]]]
             [environ.core :refer [env]]
             [robert.hooke :refer [add-hook]]
-            [taoensso.timbre :as timbre :refer [errorf info merge-config!]]))
+            [taoensso.timbre :as timbre :refer [merge-config!]]))
 
 (def ^:private ^:dynamic _tag nil)
 
@@ -29,10 +29,10 @@
          pre-log-msg# (:pre-log-msg ~m)
          post-log-msg# (:post-log-msg ~m)]
      (if (fn? pre-log-msg#)
-       (do (pre-log-msg#) (info (or operation# "")))
-       (info (str (or pre-log-msg# "started: ") (or operation# ""))))
+       (do (pre-log-msg#) (timbre/info (or operation# "")))
+       (timbre/info (str (or pre-log-msg# "started: ") (or operation# ""))))
      (let [result# ~@body]
-       (info (str (or post-log-msg# "finished: ") (or operation# "")))
+       (timbre/info (str (or post-log-msg# "finished: ") (or operation# "")))
        result#)))
 
 (defmacro log-wrapper
@@ -84,7 +84,7 @@
    :timezone (java.util.TimeZone/getDefault)})
 
 (defn- exception-handler [throwable ^Thread thread]
-  (errorf throwable "Uncaught exception on thread: %s"
+  (timbre/errorf throwable "Uncaught exception on thread: %s"
           (.getName thread)))
 
 (defn- output-fn
@@ -142,7 +142,37 @@
                         :level level}))
     (timbre/info "Skipping custom log formatter.")))
 
+(defmacro log
+  [& args]
+  `(timbre/log ~@args))
+
+(defmacro trace
+  [& args]
+  `(timbre/trace ~@args))
+
+(defmacro debug
+  [& args]
+  `(timbre/debug ~@args))
+
+(defmacro info
+  [& args]
+  `(timbre/info ~@args))
+
+(defmacro warn
+  [& args]
+  `(timbre/warn ~@args))
+
+(defmacro error
+  [& args]
+  `(timbre/error ~@args))
+
+(defmacro fatal
+  [& args]
+  `(timbre/fatal ~@args))
+
 (comment
+  (log :info "message")
+  (trace "message")
   (setup-loga :obfuscate [:password] :level :debug)
   (setup-loga :level :debug)
   (timbre/info "Log event with params" {:password "secret" :bar "baz" :sub {:password "secret" :foo "bar"}})

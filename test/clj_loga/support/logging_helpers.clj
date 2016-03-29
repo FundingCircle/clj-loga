@@ -1,5 +1,6 @@
 (ns clj-loga.support.logging-helpers
-  (:require [cheshire.core :refer [parse-string]]))
+  (:require [cheshire.core :refer [parse-string]]
+            [clojure.walk :refer [keywordize-keys]]))
 
 (declare get-log-element)
 
@@ -14,6 +15,9 @@
 (defn latest-log-event []
   (first @log-events))
 
+(defn latest-log-event-map []
+  (some-> (latest-log-event) parse-string keywordize-keys))
+
 (defn earliest-log-event []
   (last @log-events))
 
@@ -22,7 +26,6 @@
    {:atom-appender
     {:enabled? true
      :async? false
-     :min-level nil
      :rate-limit [[1 250] [10 5000]]
      :output-fn :inherit
      :fn
@@ -33,6 +36,10 @@
 
 (defn get-log-element [log element]
   (get (parse-string log) element))
+
+(defn uuid
+  []
+  (.toString (java.util.UUID/randomUUID)))
 
 (comment
   @log-events
