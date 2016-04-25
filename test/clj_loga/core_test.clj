@@ -61,6 +61,22 @@
           result (log-wrapper {:operation "a-operation"} expected-result)]
       (is (= result expected-result)))))
 
+(deftest append-stacktrace-test
+  (reset-log-events)
+  (let [ex-message (uuid)
+        ex-data {:cause (uuid)}
+        message (uuid)
+        e (ex-info ex-message ex-data)
+        _ (loga/error e message)]
+    (testing "logs stacktrace"
+      (is (some? (:stacktrace (latest-log-event-map)))))
+    (testing "logs message"
+      (is (= message (:message (latest-log-event-map)))))
+    (testing "logs ex-message"
+      (is (= (.toString e) (:exception-message (latest-log-event-map)))))
+    (testing "logs ex-data"
+      (is (= ex-data (:exception-data (latest-log-event-map)))))))
+
 (deftest log-test
   (reset-log-events)
   (let [level :info

@@ -58,10 +58,22 @@
 (defn- format-stacktrace [err opts]
   (format (join "\n " (map str (.getStackTrace err)))))
 
+(defn- append-ex-data [m e]
+  (if (instance? clojure.lang.ExceptionInfo e)
+    (assoc m :exception-data (ex-data e))
+    m))
+
+(defn- append-ex-defaults [m e opts]
+  (assoc m
+         :stacktrace (str (format-stacktrace e opts))
+         :exception-message (str (.toString e))))
+
 (defn- append-stacktrace* [{:keys [?err_ opts]} m]
   (if-not (:no-stacktrace? opts)
     (when-let [err (force ?err_)]
-      (assoc m :stacktrace (str (format-stacktrace err opts))))))
+      (-> m
+       (append-ex-defaults err opts)
+       (append-ex-data err)))))
 
 (defn- append-stacktrace [data m]
   "If stacktrace is present in data, returns log event with stacktrace
