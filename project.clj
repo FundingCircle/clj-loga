@@ -21,5 +21,7 @@
                    :username [:gpg :env/clojars_user]
                    :password [:gpg :env/clojars_password]}]]
   :plugins [[lein-cljfmt  "0.3.0"]
-            [lein-environ "1.0.1"]]
+            [lein-environ "1.0.1"]
+            [test2junit "1.1.2"]]
+  :test2junit-output-dir ~(or (System/getenv "CIRCLE_TEST_REPORTS") "target/test2junit")
   :profiles {:test {:env {:enable-loga "true"}}})
