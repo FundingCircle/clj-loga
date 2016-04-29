@@ -10,6 +10,13 @@
                  [environ "0.5.0"]                     ;; Environment variables
                  [robert/hooke "1.3.0"]                ;; Hooks
                  ]
+
+  :repositories [["releases"
+                  {:url "https://clojars.org/repo"
+                   :sign-releases false
+                   :username [:gpg :env/clojars_user]
+                   :password [:gpg :env/clojars_password]}]]
+
   :plugins [[lein-cljfmt  "0.3.0"]
             [lein-environ "1.0.1"]]
   :profiles {:test {:env {:enable-loga "true"}}})
