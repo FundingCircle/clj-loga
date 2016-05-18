@@ -102,11 +102,14 @@
 (defn- output-fn
   ([data] (output-fn nil data))
   ([opts data]
-   (->> data
-        format-log-event
-        (append-stacktrace data)
-        append-tag
-        generate-string)))
+   (let [formatted-log (format-log-event data)]
+     (try
+       (->> formatted-log
+            (append-stacktrace data)
+            append-tag
+            generate-string)
+       (catch Exception e
+         (format "Unable to process log event due to error %s. Log: %s" (.getMessage e) formatted-log))))))
 
 (defn- loga-enabled? []
   (= (env :enable-loga) "true"))
