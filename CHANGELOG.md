@@ -10,5 +10,5 @@ All notable changes to this project will be documented in this file. This change
 1. Add support for `ex-info`. `ex-data` are accessible on `:exception-data` key as part of the log message.
 2. Add error message to the exception message is accessible on `exception-message` key as part of the log message
 
-## [0.5.2] - 18/5/2016
+## [0.5.3] - 18/5/2016
 1. Handle exception in processing log event.
