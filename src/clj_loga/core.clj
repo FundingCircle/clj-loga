@@ -63,10 +63,17 @@
     (assoc m :exception-data (ex-data e))
     m))
 
+(defn- exception-map
+  [m e]
+  (let [error-message (str (.toString e))]
+   (if (nil? (:message m))
+    {:message error-message}
+    {:exception-message error-message})))
+
 (defn- append-ex-defaults [m e opts]
-  (assoc m
-         :stacktrace (str (format-stacktrace e opts))
-         :exception-message (str (.toString e))))
+  (merge m
+         {:stacktrace (str (format-stacktrace e opts))}
+         (exception-map m e)))
 
 (defn- append-stacktrace* [{:keys [?err_ opts]} m]
   (if-not (:no-stacktrace? opts)

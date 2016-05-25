@@ -77,6 +77,12 @@
     (testing "logs ex-data"
       (is (= ex-data (:exception-data (latest-log-event-map)))))))
 
+(deftest appends-error-message-to-message
+  (reset-log-events)
+  (let [_ (loga/error (Exception.))]
+    (testing "logs message"
+      (is (= "java.lang.Exception" (:message (latest-log-event-map)))))))
+
 (deftest log-test
   (reset-log-events)
   (let [level :info
