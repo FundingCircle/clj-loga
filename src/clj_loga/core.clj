@@ -91,9 +91,9 @@
 
 (defn- format-log-event
   [{:keys [level ?err_ vargs_ msg_ ?ns-str hostname_ timestamp_ ?line]}]
-  {:timestamp @timestamp_
+  {:timestamp (force timestamp_)
    :level (upper-case (name level))
-   :message @msg_
+   :message (str (force msg_))
    :namespace ?ns-str})
 
 (def ^:private iso-timestamp-opts
@@ -116,7 +116,8 @@
             append-tag
             generate-string)
        (catch Exception e
-         (format "Unable to process log event due to error %s. Log: %s" (.getMessage e) formatted-log))))))
+         (println (format "Unable to process log event. Falling back to default formatting; cause: %s, log: %s" (.getMessage e) formatted-log))
+         (timbre/default-output-fn data))))))
 
 (defn- loga-enabled? []
   (= (env :enable-loga) "true"))

@@ -15,3 +15,6 @@ All notable changes to this project will be documented in this file. This change
 
 ## [0.6.0] - 25/5/2016
 1. Log exception message to message if no message was supplied.
+
+## [0.6.1] - 07/6/2016
+1. Fallback to default timbre output function if exception thrown during processing logs.
