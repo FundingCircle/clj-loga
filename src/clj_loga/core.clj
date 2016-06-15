@@ -66,7 +66,7 @@
 (defn- exception-map
   [m e]
   (let [error-message (str (.toString e))]
-   (if (nil? (:message m))
+   (if (empty? (:message m))
     {:message error-message}
     {:exception-message error-message})))
 
