@@ -79,9 +79,10 @@
 
 (deftest appends-error-message-to-message
   (reset-log-events)
-  (let [_ (loga/error (Exception.))]
+  (let [message (uuid)
+        _ (loga/error (Exception. message))]
     (testing "logs message"
-      (is (= "java.lang.Exception" (:message (latest-log-event-map)))))))
+      (is (= (format "java.lang.Exception: %s" message) (:message (latest-log-event-map)))))))
 
 (deftest log-test
   (reset-log-events)
