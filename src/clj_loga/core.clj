@@ -152,14 +152,14 @@
                   (log-wrapper meta-args (apply f args)))))))
 
 (defn setup-loga
-  "Initialize formatted logging."
+  "Initialise formatted logging."
   [& {:keys [level namespaces obfuscate]
       :or {level :info namespaces [:all] obfuscate []}}]
   (if (loga-enabled?)
     (do (timbre/handle-uncaught-jvm-exceptions!)
         (set-loga-hooks namespaces)
-        (merge-config! {:middleware [(fn [{:keys [vargs_] :as data}]
-                                       (assoc data :vargs_ (delay (obfuscate-data @vargs_ obfuscate))))]
+        (merge-config! {:middleware [(fn [{:keys [vargs] :as data}]
+                                       (assoc data :vargs (obfuscate-data vargs obfuscate)))]
                         :output-fn output-fn
                         :timestamp-opts iso-timestamp-opts
                         :level level}))

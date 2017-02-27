@@ -10,11 +10,14 @@ All notable changes to this project will be documented in this file. This change
 1. Add support for `ex-info`. `ex-data` are accessible on `:exception-data` key as part of the log message.
 2. Add error message to the exception message is accessible on `exception-message` key as part of the log message.
 
-## [0.5.3] - 18/5/2016
+## [0.5.3] - 18/05/2016
 1. Handle exception in processing log event.
 
-## [0.6.0] - 25/5/2016
+## [0.6.0] - 25/05/2016
 1. Log exception message to message if no message was supplied.
 
-## [0.6.1] - 07/6/2016
+## [0.6.1] - 07/06/2016
 1. Fallback to default timbre output function if exception thrown during processing logs.
+
+## [0.7.0] - 28/02/2017
+1. Update dependencies. 

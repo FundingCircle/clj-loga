@@ -7,7 +7,10 @@ Standing on the shoulders of the great logging library [Timbre](https://github.c
 
 Loga also provides wrappers around Timbre's logging macros to allow logging directly from the library. It removes the need to use Timbre in the application directly, thus reducing risk of conflicts between version of Timbre used in Logs and in the application.
 
-Supports Timbre >= 4.1.1.
+## Warning
+This library depends on Timbre `[com.taoensso/timbre "4.8.0"]`. If Timbre is also required in your project, make sure they are compatible.
+
+Supports `[com.taoensso/timbre "4.4.0"]` and higher version.
 
 ## Usage
 
