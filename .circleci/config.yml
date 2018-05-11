@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: clojure:lein-alpine
+    steps:
+      - checkout
+      - run: lein deps
+      - run: lein test
+    working_directory: ~/clj-loga
