@@ -5,6 +5,14 @@ jobs:
       - image: clojure:lein-alpine
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - clj-loga-{{ checksum "project.clj" }}
+            - clj-loga-
       - run: lein deps
+      - save_cache:
+          key: clj-loga-{{ checksum "project.clj" }}
+          paths:
+            - ~/.m2
       - run: lein test
     working_directory: ~/clj-loga
