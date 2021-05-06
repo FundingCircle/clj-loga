@@ -4,9 +4,9 @@ jobs:
     docker:
       - image: circleci/clojure:lein-2.8.1
       steps:
-        - git config --global user.email "circleci@circleci.com"
-        - git config --global user.name "CircleCI"
-        - lein do deploy, vcs tag --no-sign :prefix "v", vcs push
+        - git config --global user.email 'circleci@circleci.com'
+        - git config --global user.name 'CircleCI'
+        - lein do deploy, vcs tag --no-sign :prefix 'v', vcs push
 workflows:
   version: 2
   deploy:
