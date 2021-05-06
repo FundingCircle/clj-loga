@@ -9,7 +9,7 @@ jobs:
       - lein do deploy, vcs tag --no-sign :prefix 'v', vcs push
 workflows:
   version: 2
-  deploy:
+  deploy_clojars:
     jobs:
       - clojars:
            filters:
