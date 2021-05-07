@@ -15,11 +15,11 @@ workflows:
   deploy_clojars:
     jobs:
       - clojars:
-          filters:
-            branches:
-              only: master
-          requires:
-            - test
-      - test 
+           filters:
+              branches:
+                only: master
+           requires:
+             -test 
+      - test
         steps:
           - run: lein test
