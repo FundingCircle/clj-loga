@@ -15,7 +15,7 @@ workflows:
   deploy_clojars:
     jobs:
       - clojars:
-          docker:
+           docker:
             - image: circleci/clojure:lein-2.8.1
            filters:
               branches:
