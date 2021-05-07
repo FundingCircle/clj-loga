@@ -21,3 +21,5 @@ workflows:
            requires:
               - test
       - test
+        docker:
+        - image: circleci/clojure:lein-2.8.1
