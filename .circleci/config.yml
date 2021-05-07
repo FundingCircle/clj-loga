@@ -15,11 +15,11 @@ workflows:
   deploy_clojars:
     jobs:
       - clojars:
-        docker:
-          - image: circleci/clojure:lein-2.8.1
-        filters:
-           branches:
-            only: master
-        requires:
-          - test
+          docker:
+            - image: circleci/clojure:lein-2.8.1
+          filters:
+            branches:
+              only: master
+          requires:
+            - test
       - test
