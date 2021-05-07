@@ -15,10 +15,9 @@ workflows:
   deploy_clojars:
     jobs:
       - clojars:
-           filters:
+            filters:
               branches:
                 only: master
             requires:
               - test
       - test
-          
