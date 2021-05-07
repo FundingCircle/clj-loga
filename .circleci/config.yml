@@ -20,6 +20,6 @@ workflows:
                 only: master
            requires:
               - test
-      -test:
+      - test:
         steps:
           - run: lein test
