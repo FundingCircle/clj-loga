@@ -7,6 +7,9 @@ jobs:
       - git config --global user.email 'circleci@circleci.com'
       - git config --global user.name 'CircleCI'
       - lein do deploy, vcs tag --no-sign :prefix 'v', vcs push
+  test:
+    steps:
+      - run: lein test
 workflows:
   version: 2
   deploy_clojars:
@@ -15,6 +18,3 @@ workflows:
            filters:
               branches:
                 only: master
-    test:
-      steps:
-        - run: lein test
