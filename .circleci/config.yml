@@ -10,6 +10,9 @@ jobs:
     docker:
       - image: circleci/clojure:lein-2.8.1
     steps:
+       - run: |
+          .circleci/bin/add-key github.com $GITHUB_SSH_FINGERPRINT
+          git fetch --force origin "refs/tags/${CIRCLE_TAG}:refs/tags/${CIRCLE_TAG}"
       - checkout
       - run: git config --global user.email 'circleci@circleci.com'
       - run: git config --global user.name 'CircleCI'
@@ -24,7 +27,26 @@ jobs:
             export REAL_GPG=$(which gpg)
 
             lein do jar, pom, deploy clojars
-            
+
+  deploy_snapshot:
+    docker:
+      - image: circleci/clojure:lein-2.8.1
+    steps:
+      - run: |
+          .circleci/bin/add-key github.com $GITHUB_SSH_FINGERPRINT
+          git fetch --force origin "refs/tags/${CIRCLE_TAG}:refs/tags/${CIRCLE_TAG}"
+      - checkout
+      - run: git config --global user.email 'circleci@circleci.com'
+      - run: git config --global user.name 'CircleCI'
+      - run:
+          name: Prepare signing key
+          command: |
+            echo $GPG_PRIVATE_KEY |base64 --decode |gpg --yes --batch --import
+      - run:
+          name: Deploy to Clojars
+          command: |
+            [ -z "$CLOJARS_USERNAME" ] || lein do jar, pom, deploy clojars
+
 workflows:
   version: 2
   deploy_clojars:
@@ -36,4 +58,13 @@ workflows:
               only: master
           requires:
             - test
+      - deploy_snapshot:
+          context: clojars-deploy
+          requires:
+            - test
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              ignore: /master/ 
       - test
