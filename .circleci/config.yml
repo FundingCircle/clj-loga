@@ -10,7 +10,7 @@ jobs:
     docker:
       - image: circleci/clojure:lein-2.8.1
     steps:
-       - run: |
+      - run: |
           .circleci/bin/add-key github.com $GITHUB_SSH_FINGERPRINT
           git fetch --force origin "refs/tags/${CIRCLE_TAG}:refs/tags/${CIRCLE_TAG}"
       - checkout
