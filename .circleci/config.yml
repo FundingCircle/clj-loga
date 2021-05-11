@@ -13,7 +13,18 @@ jobs:
       - checkout
       - run: git config --global user.email 'circleci@circleci.com'
       - run: git config --global user.name 'CircleCI'
-      - run: lein do deploy, vcs tag --no-sign :prefix 'v', vcs push
+      - run:
+          name: Prepare signing key
+          command: |
+            echo $GPG_PRIVATE_KEY |base64 --decode |gpg --yes --batch --import
+      - run:
+          name: Deploy to Clojars
+          command: |
+            export LEIN_GPG=/home/circleci/jackdaw/.circleci/bin/gpg
+            export REAL_GPG=$(which gpg)
+
+            lein do jar, pom, deploy clojars
+            
 workflows:
   version: 2
   deploy_clojars:
