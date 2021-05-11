@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Deploy to Clojars
           command: |
-            export LEIN_GPG=/home/circleci/jackdaw/.circleci/bin/gpg
+            export LEIN_GPG=/home/circleci/clj-loga/.circleci/bin/gpg
             export REAL_GPG=$(which gpg)
 
             lein do jar, pom, deploy clojars
