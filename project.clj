@@ -1,4 +1,4 @@
-(defproject clj-loga "0.7.3"
+(defproject clj-loga "0.7.4"
   :description "Library for custom log formatting and other helpers leveraging Timbre"
   :url "https://github.com/FundingCircle/clj-loga"
   :license {:name "BSD 3-Clause License"
