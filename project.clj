@@ -13,7 +13,7 @@
   :repositories [["releases"
                   {:url "https://clojars.org/repo"
                    :sign-releases false
-                   :username [:gpg :env/clojars_user]
+                   :username [:gpg :env/clojars_username]
                    :password [:gpg :env/clojars_password]}]]
 
   :plugins [[lein-cljfmt  "0.3.0"]
