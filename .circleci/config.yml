@@ -19,6 +19,7 @@ workflows:
   deploy_clojars:
     jobs:
       - clojars:
+          context: clojars-deploy
           filters:
             branches:
               only: master
